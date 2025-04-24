@@ -7,6 +7,20 @@
 
 import SwiftUI
 
+struct BoardingData {
+    let title: String
+    let description: String
+}
+
+let onboardingData: [BoardingData] = [
+    .init(title: "Let's explore\nKinds of coffee", description: "Let's explore various coffee flavors with us with just few clicks"),
+    .init(title: "Monitor and visit the cafe", description: "Monitor the state of the cafe and visit with your friends"),
+    .init(
+        title: "Get ready for the newest coffee",
+        description: "Get ready to try the newest coffee variant with your friends"
+    ),
+]
+
 struct Onboarding: View {
     @State private var currentIndex = 0
     let totalPages = 3
@@ -31,18 +45,13 @@ struct Onboarding: View {
             }
             VStack {
                 Spacer()
-                Text("Let's explore")
-                    .font(.system(size: 40, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
-                Text("Kinds of coffee")
+                Text(onboardingData[currentIndex].title)
                     .font(.system(size: 40, weight: .bold))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
                 Text(
-                    "Let's explore various coffee flavors with us with just few clicks"
+                    onboardingData[currentIndex].description
                 )
                 .foregroundStyle(.white)
                 .padding(.horizontal)
