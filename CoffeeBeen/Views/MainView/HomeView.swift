@@ -74,7 +74,7 @@ struct HomeView: View {
                         GridItem(.flexible(), spacing: Theme.spacingMedium)
                     ], spacing: Theme.spacingMedium) {
                         ForEach(coffees) { coffee in
-                            CoffeeCard(coffee: coffee)
+                            CoffeeCardHome(coffee: coffee)
                         }
                     }
                     .padding(.horizontal, Theme.spacingMedium)
@@ -114,7 +114,7 @@ struct Coffee: Identifiable {
     let imageName: String
 }
 
-struct CoffeeCard: View {
+struct CoffeeCardHome: View {
     let coffee: Coffee
     @Environment(\.colorScheme) var colorScheme
     
