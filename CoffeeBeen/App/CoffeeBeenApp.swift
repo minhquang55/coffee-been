@@ -24,7 +24,7 @@ struct CoffeeBeenApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppRouter()
         }
     }
 }

@@ -1,13 +1,13 @@
 //
-//  ContentView.swift
+//  MainTabView.swift
 //  CoffeeBeen
 //
-//  Created by Trần Minh Quang on 23/4/25.
+//  Created by Trần Minh Quang on 25/4/25.
 //
 
 import SwiftUI
 
-struct ContentView: View {
+struct MainTabView: View {
     @State private var selectedTab = 0
 
     var body: some View {
@@ -45,8 +45,4 @@ struct ContentView: View {
                 .tag(3)
         }
     }
-}
-
-#Preview {
-    ContentView()
 }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CoffeeCard: View {
-    let coffee: CoffeePlace
+    let coffee: CoffeeModel
     let width: CGFloat
     let height: CGFloat
     

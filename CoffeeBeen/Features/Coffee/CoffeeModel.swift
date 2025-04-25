@@ -1,6 +1,6 @@
 import Foundation
 
-struct CoffeePlace: Identifiable {
+struct CoffeeModel: Identifiable {
     let id = UUID()
     let name: String
     let location: String
@@ -13,7 +13,7 @@ struct CoffeePlace: Identifiable {
 // Sample Data
 extension Coffee {
     static let sampleData = [
-        CoffeePlace(
+        CoffeeModel(
             name: "Coffe Bean",
             location: "Bali, Indonesia",
             rating: 0.0,
@@ -21,7 +21,7 @@ extension Coffee {
             description: "",
             isFavorite: true
         ),
-        CoffeePlace(
+        CoffeeModel(
             name: "Coffe Bean",
             location: "Bandung, Indonesia",
             rating: 0.0,
@@ -29,7 +29,7 @@ extension Coffee {
             description: "",
             isFavorite: true
         ),
-        CoffeePlace(
+        CoffeeModel(
             name: "Coffe Bean - Resort Kuta",
             location: "Kuta, Indonesia",
             rating: 4.9,
@@ -37,7 +37,7 @@ extension Coffee {
             description: "One of the best and most popular coffee",
             isFavorite: false
         ),
-        CoffeePlace(
+        CoffeeModel(
             name: "Coffe Bean - Mandalika's",
             location: "Mandalika, Indonesia",
             rating: 4.8,
@@ -45,7 +45,7 @@ extension Coffee {
             description: "One of the best and most popular coffee",
             isFavorite: false
         ),
-        CoffeePlace(
+        CoffeeModel(
             name: "Coffe Bean - Street View",
             location: "Street View",
             rating: 4.7,

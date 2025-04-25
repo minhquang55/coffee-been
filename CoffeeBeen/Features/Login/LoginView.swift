@@ -6,6 +6,7 @@ struct LoginFormState {
 }
 
 struct LoginView: View {
+    var onLoginSuccess: () -> Void
     @State private var loginFormState = LoginFormState()
     @State var isRememberMe = false
     @State var isPasswordVisible = false
@@ -124,8 +125,4 @@ struct LoginView: View {
             .padding(.bottom, 40)
         }
     }
-}
-
-#Preview {
-    LoginView()
 }

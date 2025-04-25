@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PopularCoffeeCard: View {
-    let coffee: CoffeePlace
+    let coffee: CoffeeModel
     
     var body: some View {
         HStack(spacing: 12) {
