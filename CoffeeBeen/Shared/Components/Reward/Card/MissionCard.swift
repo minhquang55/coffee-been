@@ -5,14 +5,32 @@ struct MissionCard: View {
     let description: String
     let currentProgress: String
     let totalProgress: String
-    let timeRemaining: String
+    let remainingTime: String
+    let imageUrl: URL?
     
     var body: some View {
         HStack(spacing: 16) {
-            Image("onboarding-1") // You'll need to add this asset
-                .resizable()
-                .frame(width: 40, height: 40)
-                .clipShape(Circle())
+            AsyncImage(url: imageUrl) { phase in
+                switch phase {
+                case .empty:
+                    ProgressView()
+                    
+                case .success(let image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                    
+                case .failure:
+                    Image(systemName: "photo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundColor(.gray)
+                @unknown default:
+                    EmptyView()
+                }
+            }
+            .frame(width: 100, height: 100)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
             
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 0) {
@@ -32,7 +50,7 @@ struct MissionCard: View {
                     Image(systemName: "clock.fill")
                         .foregroundColor(.red)
                         .font(.headline)
-                    Text("Ends in \(timeRemaining)")
+                    Text(remainingTime)
                         .font(.body)
                         .foregroundColor(.red)
                 }
