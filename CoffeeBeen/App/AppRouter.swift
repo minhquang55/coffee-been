@@ -20,8 +20,8 @@ struct AppRouter: View {
             LoginView(onLoginSuccess: {
                 appState.loginSuccess()
             })
-        case .home:
-            HomeView()
+        case .main:
+            MainTabView()
         }
     }
 //        .environmentObject(appState) // chia sẻ cho toàn bộ app nếu cần

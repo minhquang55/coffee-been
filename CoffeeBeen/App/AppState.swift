@@ -10,7 +10,7 @@ import Combine
 
 class AppState: ObservableObject {
     enum Route {
-        case splash, login, home
+        case splash, login, main
     }
 
     @Published var route: Route = .splash
@@ -18,11 +18,11 @@ class AppState: ObservableObject {
     func finishSplash() {
         // Có thể check auth ở đây
         let isLoggedIn = false // thay bằng check Firebase/Auth
-        self.route = isLoggedIn ? .home : .login
+        self.route = isLoggedIn ? .main : .login
     }
 
     func loginSuccess() {
-        self.route = .home
+        self.route = .main
     }
 
     func logout() {
