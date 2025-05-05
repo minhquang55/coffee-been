@@ -40,10 +40,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		CD692D052DBB7F6D00F32E2C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		CDA1AF562DB8D37500530A52 = {
 			isa = PBXGroup;
 			children = (
 				CDA1AF612DB8D37500530A52 /* CoffeeBeen */,
+				CD692D052DBB7F6D00F32E2C /* Frameworks */,
 				CDA1AF602DB8D37500530A52 /* Products */,
 			);
 			sourceTree = "<group>";

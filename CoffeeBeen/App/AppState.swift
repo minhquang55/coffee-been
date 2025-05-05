@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import FirebaseAuth
 
 class AppState: ObservableObject {
     enum Route {
@@ -14,11 +15,26 @@ class AppState: ObservableObject {
     }
 
     @Published var route: Route = .splash
+    private var cancellables = Set<AnyCancellable>()
+
+    init() {
+        setupSubscribers()
+    }
+
+    private func setupSubscribers() {
+        AuthService.shared.$userSession
+            .sink { [weak self] userSession in
+                self?.route = userSession == nil ? .login : .main
+            }
+            .store(in: &cancellables)
+    }
 
     func finishSplash() {
-        // Có thể check auth ở đây
-        let isLoggedIn = false // thay bằng check Firebase/Auth
-        self.route = isLoggedIn ? .main : .login
+        if AuthService.shared.userSession != nil {
+            self.route = .main
+        } else {
+            self.route = .login
+        }
     }
 
     func loginSuccess() {
@@ -26,6 +42,6 @@ class AppState: ObservableObject {
     }
 
     func logout() {
-        self.route = .login
+        AuthService.shared.signOut()
     }
 }

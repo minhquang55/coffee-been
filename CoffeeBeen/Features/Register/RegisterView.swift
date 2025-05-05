@@ -1,14 +1,30 @@
 import SwiftUI
 
 struct RegisterFormState {
-    var firstname: String = ""
-    var lastname: String = ""
+    var firstName: String = ""
+    var lastName: String = ""
     var email: String = ""
     var password: String = ""
-    var OTP: String = ""
+    
+    var firstNameError: String?
+    var lastNameError: String?
+    var emailError: String?
+    var passwordError: String?
+    
+    var isValid: Bool {
+        firstNameError == nil && lastNameError == nil && emailError == nil && passwordError == nil
+    }
 }
 
 struct RegisterView: View {
+    @State private var registerFormState = RegisterFormState()
+    @State private var step = 1
+    @State private var prevStep = 1
+    @State private var isLoading = false
+    @State private var showAlert = false
+    @State private var alertMessage = ""
+    @State private var alertType: AlertView.AlertType = .error
+    @Environment(\.dismiss) var dismiss
     
     private let registerSteps: [Int: [String: String]] = [
         1: [
@@ -20,44 +36,89 @@ struct RegisterView: View {
             "stepDescription": "Input Your Account"
         ],
         3: [
-            "buttonText": "Verification",
+            "buttonText": "Submit",
             "stepDescription": "Input Your Password"
         ],
         4: [
-            "buttonText": "Submit",
-            "stepDescription": "Input OTP Verification"
-        ],
-        5: [
             "buttonText": "Let's Explore"
         ]
     ]
     
-    @State private var step = 1
-    @State private var isPasswordVisible = false
-    @State private var registerFormState = RegisterFormState()
-    @State private var prevStep = 1
+    private func validateForm() {
+        // Validate First Name
+        registerFormState.firstNameError = Validation.validate(
+            registerFormState.firstName,
+            rules: [.required, .minLength(2), .maxLength(50)]
+        )
+        
+        // Validate Last Name
+        registerFormState.lastNameError = Validation.validate(
+            registerFormState.lastName,
+            rules: [.required, .minLength(2), .maxLength(50)]
+        )
+        
+        // Validate Email
+        registerFormState.emailError = Validation.validate(
+            registerFormState.email,
+            rules: [.required, .email]
+        )
+        
+        // Validate Password
+        registerFormState.passwordError = Validation.validate(
+            registerFormState.password,
+            rules: [.required, .minLength(6), .maxLength(20)]
+        )
+    }
     
-    private func isCurrentStepValid() -> Bool {
+    private func showValidationError() {
+        let error: String?
         switch step {
         case 1:
-            return !registerFormState.firstname.isEmpty
+            error = registerFormState.firstNameError ?? registerFormState.lastNameError
         case 2:
-            return !registerFormState.email.isEmpty && registerFormState.email.contains("@")
+            error = registerFormState.emailError
         case 3:
-            return !registerFormState.password.isEmpty
-        case 4:
-            return registerFormState.OTP.count == 4
+            error = registerFormState.passwordError
+        default:
+            error = nil
+        }
+        
+        if let error = error {
+            alertMessage = error
+            alertType = .error
+            showAlert = true
+        }
+    }
+    
+    private func isCurrentStepValid() -> Bool {
+        validateForm()
+        
+        switch step {
+        case 1:
+            return registerFormState.firstNameError == nil && registerFormState.lastNameError == nil
+        case 2:
+            return registerFormState.emailError == nil
+        case 3:
+            return registerFormState.passwordError == nil
         default:
             return true
         }
     }
     
     private func handleNextStep() {
-        if true {
-            withAnimation {
-                prevStep = step
-                step = min(step + 1, 5)
+        if isCurrentStepValid() {
+            if step == 3 {
+                Task {
+                    await registerUser()
+                }
+            } else {
+                withAnimation {
+                    prevStep = step
+                    step = min(step + 1, 4)
+                }
             }
+        } else {
+            showValidationError()
         }
     }
     
@@ -67,10 +128,34 @@ struct RegisterView: View {
             step = max(step - 1, 1)
         }
     }
+    
+    private func registerUser() async {
+        isLoading = true
+        
+        do {
+            try await AuthService.shared.register(
+                withEmail: registerFormState.email,
+                password: registerFormState.password,
+                firstName: registerFormState.firstName,
+                lastName: registerFormState.lastName
+            )
+            
+            withAnimation {
+                prevStep = step
+                step = min(step + 1, 4)
+            }
+        } catch {
+            alertMessage = error.localizedDescription
+            alertType = .error
+            showAlert = true
+        }
+        
+        isLoading = false
+    }
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: step == 5 ? .center : .leading, spacing: 24) {
+            VStack(alignment: step == 4 ? .center : .leading, spacing: 24) {
                 if let stepDescription = registerSteps[step]?["stepDescription"] {
                     Text(stepDescription)
                         .foregroundColor(.gray)
@@ -92,10 +177,6 @@ struct RegisterView: View {
                             .transition(.move(edge: prevStep < step ? .trailing : .leading))
                     }
                     if step == 4 {
-                        step4View()
-                            .transition(.move(edge: prevStep < step ? .trailing : .leading))
-                    }
-                    if step == 5 {
                         successView()
                             .transition(.opacity)
                     }
@@ -108,6 +189,13 @@ struct RegisterView: View {
                     PrimaryButton(buttonText: buttonText) {
                         handleNextStep()
                     }
+                    .disabled(isLoading)
+                    .overlay {
+                        if isLoading {
+                            ProgressView()
+                                .tint(.white)
+                        }
+                    }
                     .padding()
                 }
             }
@@ -115,7 +203,7 @@ struct RegisterView: View {
             .navigationBarBackButtonHidden(step == 1 ? false : true)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    if step > 1 && step < 5 {
+                    if step > 1 && step < 4 {
                         Button(action: {
                             handlePrevStep()
                         }) {
@@ -126,6 +214,15 @@ struct RegisterView: View {
                 }
             }
         }
+        .alert(
+            isPresented: $showAlert,
+            alert: AlertView(
+                title: alertType == .error ? "Error" : "Success",
+                message: alertMessage,
+                type: alertType,
+                onDismiss: { showAlert = false }
+            )
+        )
     }
 
     // MARK: Step Views
@@ -133,19 +230,23 @@ struct RegisterView: View {
     @ViewBuilder
     private func step1View() -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("First Name")
-                .foregroundColor(.gray)
-            TextField("First Name", text: $registerFormState.firstname)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
+            VStack(alignment: .leading, spacing: 8) {
+                Text("First Name")
+                    .foregroundColor(.gray)
+                TextField("First Name", text: $registerFormState.firstName)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+            }
 
-            Text("Last Name")
-                .foregroundColor(.gray)
-            TextField("Last Name", text: $registerFormState.lastname)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Last Name")
+                    .foregroundColor(.gray)
+                TextField("Last Name", text: $registerFormState.lastName)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+            }
         }
         .padding(.horizontal)
     }
@@ -153,33 +254,26 @@ struct RegisterView: View {
     @ViewBuilder
     private func step2View() -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Your Email")
-                .foregroundColor(.gray)
-            TextField("Your Email", text: $registerFormState.email)
-                .keyboardType(.emailAddress)
-                .autocapitalization(.none)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Your Email")
+                    .foregroundColor(.gray)
+                TextField("Your Email", text: $registerFormState.email)
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+            }
         }
         .padding(.horizontal)
     }
 
     @ViewBuilder
     private func step3View() -> some View {
-        PasswordField(spacing: 16, password: $registerFormState.password).padding(.horizontal)
-    }
-
-    @ViewBuilder
-    private func step4View() -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("OTP Code")
-                .foregroundColor(.gray)
-            TextField("Enter OTP code", text: $registerFormState.OTP)
-                .keyboardType(.numberPad)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
+            VStack(alignment: .leading, spacing: 8) {
+                PasswordField(spacing: 8, password: $registerFormState.password)
+            }
         }
         .padding(.horizontal)
     }
@@ -193,7 +287,13 @@ struct RegisterView: View {
             Text("Registration Successful!")
                 .font(.title2)
                 .bold()
-        }.padding(.top, 200)
+        }
+        .padding(.top, 200)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                dismiss()
+            }
+        }
     }
 }
 
