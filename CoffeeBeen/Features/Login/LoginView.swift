@@ -10,7 +10,11 @@ struct LoginView: View {
     @State private var loginFormState = LoginFormState()
     @State var isRememberMe = false
     @State var isPasswordVisible = false
-    
+    @State private var isLoading = false
+    @State private var showAlert = false
+    @State private var alertMessage = ""
+    @State private var alertType: AlertView.AlertType = .error
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
@@ -18,45 +22,56 @@ struct LoginView: View {
                 Logo()
                     .scaleEffect(1.5)
                     .padding(.top, 100)
-                
+
                 Spacer()
-                
+
                 // Form
                 VStack(spacing: 24) {
                     // Email field
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Email")
                             .foregroundColor(.gray)
-                        TextField("coffeebeen@gmail.com", text: $loginFormState.email)
-                            .textFieldStyle(.plain)
-                            .padding(.vertical, 12)
-                            .overlay(
-                                Rectangle()
-                                    .frame(height: 1)
-                                    .foregroundColor(.gray.opacity(0.3))
-                                    .offset(y: 12)
-                            )
+                        TextField(
+                            "coffeebeen@gmail.com",
+                            text: $loginFormState.email
+                        )
+                        .autocapitalization(.none)
+                        .textFieldStyle(.plain)
+                        .padding(.vertical, 12)
+                        .overlay(
+                            Rectangle()
+                                .frame(height: 1)
+                                .foregroundColor(.gray.opacity(0.3))
+                                .offset(y: 12)
+                        )
                     }
-                    
+
                     // Password field
-                    PasswordField(spacing: 8, password: $loginFormState.password)
-                    
+                    PasswordField(
+                        spacing: 8,
+                        password: $loginFormState.password
+                    )
+
                     // Remember me & Forgot password
                     HStack {
                         HStack(spacing: 8) {
                             Button(action: {
                                 isRememberMe.toggle()
                             }) {
-                                Image(systemName: isRememberMe ? "checkmark.square.fill" : "square")
-                                    .foregroundColor(isRememberMe ? Theme.primary : .gray)
+                                Image(
+                                    systemName: isRememberMe ? "checkmark.square.fill" : "square"
+                                )
+                                .foregroundColor(
+                                    isRememberMe ? Theme.primary : .gray
+                                )
                             }
                             Text("Remember me")
                                 .font(.system(size: 14))
                                 .foregroundColor(.gray)
                         }
-                        
+
                         Spacer()
-                        
+
                         Button(action: {
                             // Handle forgot password
                         }) {
@@ -65,33 +80,40 @@ struct LoginView: View {
                                 .foregroundColor(Theme.primary)
                         }
                     }
-                    
+
                     // Create Account
                     NavigationLink(destination: RegisterView()) {
                         Text("Create Account")
                             .foregroundColor(Theme.primary)
                     }.padding(.top, 12)
-                    
+
                     // Sign In button
                     Button(action: {
-                        // Handle sign in
+                        handleSignIn()
                     }) {
-                        Text("Sign In")
-                            .fontWeight(.semibold)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Theme.primary)
-                            .foregroundColor(.white)
-                            .cornerRadius(12)
+                        if isLoading {
+                            ProgressView()
+                                .tint(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                        } else {
+                            Text("Sign In")
+                                .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                        }
                     }
+                    .background(Theme.primary)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
                     .padding(.top, 12)
-                    
+
                     // Social login
                     VStack(spacing: 20) {
                         Text("or continue with")
                             .font(.system(size: 14))
                             .foregroundColor(.gray)
-                        
+
                         HStack(spacing: 40) {
                             // Google
                             Button(action: {}) {
@@ -99,7 +121,7 @@ struct LoginView: View {
                                     .resizable()
                                     .frame(width: 24, height: 24)
                             }
-                            
+
                             // Apple
                             Button(action: {}) {
                                 Image(systemName: "apple.logo")
@@ -109,7 +131,7 @@ struct LoginView: View {
                                     .foregroundStyle(Color.white)
                                     .background(Circle().fill(Color.black))
                             }
-                            
+
                             // Facebook
                             Button(action: {}) {
                                 Image(systemName: "f.circle.fill")
@@ -124,5 +146,39 @@ struct LoginView: View {
             }
             .padding(.bottom, 40)
         }
+        .alert(
+            isPresented: $showAlert,
+            alert: AlertView(
+                title: alertType == .error ? "Error" : "Success",
+                message: alertMessage,
+                type: alertType,
+                onDismiss: { showAlert = false }
+            ))
     }
+
+    private func handleSignIn() {
+        isLoading = true
+        print("Sign in")
+        Task {
+            do {
+                try await AuthService.shared.signIn(
+                    withEmail: loginFormState.email, password: loginFormState.password)
+                isLoading = false
+                onLoginSuccess()
+            } catch {
+                isLoading = false
+                alertMessage = error.localizedDescription
+                alertType = .error
+                showAlert = true
+            }
+        }
+    }
+}
+
+#Preview {
+    LoginView(
+        onLoginSuccess: {},
+        isRememberMe: false,
+        isPasswordVisible: false
+    )
 }
