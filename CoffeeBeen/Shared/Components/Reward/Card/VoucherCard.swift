@@ -36,6 +36,7 @@ struct VoucherCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.headline)
+                    .foregroundColor(.black)
                 Text(description)
                     .font(.subheadline)
                     .foregroundColor(.gray)

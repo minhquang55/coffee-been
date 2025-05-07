@@ -1,15 +1,30 @@
-import Foundation
 import FirebaseFirestore
+import Foundation
 
-class BaseReward: Identifiable {
+class BaseReward: Identifiable, Hashable, Equatable {
+    static func == (lhs: BaseReward, rhs: BaseReward) -> Bool {
+        return lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
     var id: String
     var title: String
     var description: String
     var effectivePeriod: Int
     var remainingTime: String
     var imageUrl: URL?
-    
-    init(id: String, title: String, description: String, effectivePeriod: Int, remainingTime: String, imageUrl: URL?) {
+
+    init(
+        id: String,
+        title: String,
+        description: String,
+        effectivePeriod: Int,
+        remainingTime: String,
+        imageUrl: URL?
+    ) {
         self.id = id
         self.title = title
         self.description = description
@@ -23,21 +38,52 @@ class UserMission: BaseReward {
     var status: MissionStatus
     var totalProgress: Int
     var currentProgress: Int
-    
-    init(id: String, title: String, description: String, effectivePeriod: Int, remainingTime: String, imageUrl: URL? = nil, status: MissionStatus, totalProgress: Int, currentProgress: Int) {
+
+    init(
+        id: String,
+        title: String,
+        description: String,
+        effectivePeriod: Int,
+        remainingTime: String,
+        imageUrl: URL? = nil,
+        status: MissionStatus,
+        totalProgress: Int,
+        currentProgress: Int
+    ) {
         self.status = status
         self.totalProgress = totalProgress
         self.currentProgress = currentProgress
-        super.init(id: id, title: title, description: description, effectivePeriod: effectivePeriod, remainingTime: remainingTime, imageUrl: imageUrl)
+        super.init(
+            id: id,
+            title: title,
+            description: description,
+            effectivePeriod: effectivePeriod,
+            remainingTime: remainingTime,
+            imageUrl: imageUrl
+        )
     }
 }
 
-
 class UserVoucher: BaseReward {
     var status: VoucherStatus
-    
-    init(id: String, title: String, description: String, effectivePeriod: Int, remainingTime: String, imageUrl: URL? = nil, status: VoucherStatus) {
+
+    init(
+        id: String,
+        title: String,
+        description: String,
+        effectivePeriod: Int,
+        remainingTime: String,
+        imageUrl: URL? = nil,
+        status: VoucherStatus
+    ) {
         self.status = status
-        super.init(id: id, title: title, description: description, effectivePeriod: effectivePeriod, remainingTime: remainingTime, imageUrl: imageUrl)
+        super.init(
+            id: id,
+            title: title,
+            description: description,
+            effectivePeriod: effectivePeriod,
+            remainingTime: remainingTime,
+            imageUrl: imageUrl
+        )
     }
 }

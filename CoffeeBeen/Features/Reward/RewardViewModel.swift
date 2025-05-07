@@ -39,8 +39,8 @@ class RewardViewModel: ObservableObject {
                     }
                     
                     let voucherData = try await fetchDocumentByCollectionName(collectionName: .vouchers, documentId: voucherId)
-                    
-                    let imageUrl = try await StorageService.shared.downloadURL(voucherData["imagePath"] as? String)
+                    let imageRef = try await StorageService.shared.getImageReference(path: voucherData["imagePath"] as? String ?? "")
+                    let imageUrl = try await StorageService.shared.downloadURL(imageReference: imageRef)
                     
                     let userVoucher = UserVoucher(
                         id: voucherId,
@@ -83,7 +83,9 @@ class RewardViewModel: ObservableObject {
 
                     let missionData = try await fetchDocumentByCollectionName(collectionName: .missions, documentId: missionId)
                     
-                    let imageUrl = try await StorageService.shared.downloadURL(missionData["imagePath"] as? String)
+                    
+                    let imageRef = try await StorageService.shared.getImageReference(path: missionData["imagePath"] as? String ?? "")
+                    let imageUrl = try await StorageService.shared.downloadURL(imageReference: imageRef)
 
                     let userMission = UserMission(
                         id: missionId,

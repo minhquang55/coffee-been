@@ -133,7 +133,7 @@ struct RegisterView: View {
         isLoading = true
         
         do {
-            try await AuthService.shared.register(
+            try await AuthViewModel.shared.register(
                 withEmail: registerFormState.email,
                 password: registerFormState.password,
                 firstName: registerFormState.firstName,
@@ -295,8 +295,4 @@ struct RegisterView: View {
             }
         }
     }
-}
-
-#Preview {
-    RegisterView()
 }

@@ -1,47 +1,40 @@
-//
-//  AppState.swift
-//  CoffeeBeen
-//
-//  Created by Trần Minh Quang on 25/4/25.
-//
-
-import Foundation
 import Combine
 import FirebaseAuth
+import Foundation
 
 class AppState: ObservableObject {
-    enum Route {
-        case splash, login, main
-    }
-
     @Published var route: Route = .splash
-    private var cancellables = Set<AnyCancellable>()
-
+    
     init() {
-        setupSubscribers()
-    }
-
-    private func setupSubscribers() {
-        AuthService.shared.$userSession
-            .sink { [weak self] userSession in
-                self?.route = userSession == nil ? .login : .main
-            }
-            .store(in: &cancellables)
-    }
-
-    func finishSplash() {
-        if AuthService.shared.userSession != nil {
-            self.route = .main
-        } else {
-            self.route = .login
+        Task {
+            await AuthViewModel.shared.fetchCurrentUser()
         }
+    }
+
+    func checkInitialRoute() {
+        if !UserDefaults.standard.bool(forKey: "hasFinishedOnboarding") {
+            route = .onboarding
+        } else if AuthenticationService.shared.currentUser == nil {
+            route = .login
+        } else {
+            route = .main
+        }
+    }
+
+    func handleFinishSplash() {
+        checkInitialRoute()
+    }
+
+    func handleFinishOnboarding() {
+        UserDefaults.standard.set(true, forKey: "hasFinishedOnboarding")
+        checkInitialRoute()
     }
 
     func loginSuccess() {
         self.route = .main
     }
 
-    func logout() {
-        AuthService.shared.signOut()
+    func signoutSuccess() {
+        self.route = .login
     }
 }

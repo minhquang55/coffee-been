@@ -161,7 +161,7 @@ struct LoginView: View {
         print("Sign in")
         Task {
             do {
-                try await AuthService.shared.signIn(
+                try await AuthViewModel.shared.signIn(
                     withEmail: loginFormState.email, password: loginFormState.password)
                 isLoading = false
                 onLoginSuccess()
@@ -173,12 +173,4 @@ struct LoginView: View {
             }
         }
     }
-}
-
-#Preview {
-    LoginView(
-        onLoginSuccess: {},
-        isRememberMe: false,
-        isPasswordVisible: false
-    )
 }

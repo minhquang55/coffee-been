@@ -13,4 +13,14 @@ struct User: Identifiable, Codable {
     var fullName: String {
         return "\(firstName) \(lastName)"
     }
-} 
+    
+    init(id: String? = nil, firstName: String, lastName: String, email: String, phoneNumber: String = "", address: String = "", profileImageUrl: String = "") {
+        self.id = id
+        self.firstName = firstName
+        self.lastName = lastName
+        self.email = email
+        self.phoneNumber = phoneNumber
+        self.address = address
+        self.profileImageUrl = profileImageUrl
+    }
+}

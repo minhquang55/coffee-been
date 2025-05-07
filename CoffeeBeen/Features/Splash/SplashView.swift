@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SplashView: View {
-    let onFinish: () -> Void
+    let onFinishSplash: () -> Void
     @State private var logoScale: CGFloat = 0.8
     @State private var logoOpacity: Double = 0.5
 
@@ -16,7 +16,7 @@ struct SplashView: View {
                         self.logoOpacity = 1.0
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                        onFinish()
+                        onFinishSplash()
                     }
                 }
             Text("Version 1.1.0")

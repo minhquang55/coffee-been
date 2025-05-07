@@ -4,19 +4,21 @@ struct RewardView: View {
     @StateObject private var rewardViewModel = RewardViewModel()
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                HeaderSection()
-                StatsSection(rewardViewModel: rewardViewModel)
-                VoucherSection(rewardViewModel: rewardViewModel)
-                MissionSection(rewardViewModel: rewardViewModel)
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 20) {
+                    HeaderSection()
+                    StatsSection(rewardViewModel: rewardViewModel)
+                    VoucherSection(rewardViewModel: rewardViewModel)
+                    MissionSection(rewardViewModel: rewardViewModel)
+                }
+                .padding(.vertical)
             }
-            .padding(.vertical)
-        }
-        .background(Color(.systemGray6))
-        .onAppear {
-            guard !rewardViewModel.isLoaded else { return }
-            rewardViewModel.loadData(userId: "hZ3yDIBkcMVT1Swp25IU")
+            .background(Color(.systemGray6))
+            .onAppear {
+                guard !rewardViewModel.isLoaded else { return }
+                rewardViewModel.loadData(userId: "Br8jYEZFuPPJXiga5nIjQVndIIz2")
+            }
         }
     }
 }
