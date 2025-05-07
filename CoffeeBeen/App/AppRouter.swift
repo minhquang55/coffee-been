@@ -1,10 +1,3 @@
-//
-//  AppRouter.swift
-//  CoffeeBeen
-//
-//  Created by Trần Minh Quang on 25/4/25.
-//
-
 import SwiftUI
 
 struct AppRouter: View {
@@ -12,21 +5,18 @@ struct AppRouter: View {
 
     var body: some View {
         switch appState.route {
+
         case .splash:
-            SplashView {
-                appState.finishSplash()
-            }
+            SplashView(onFinishSplash: appState.handleFinishSplash)
+
+        case .onboarding:
+            Onboarding(onFinishOnboarding: appState.handleFinishOnboarding)
+
         case .login:
-            LoginView(onLoginSuccess: {
-                appState.loginSuccess()
-            })
+            LoginView(onLoginSuccess: appState.loginSuccess)
+
         case .main:
-            MainTabView()
+            MainTabView().environmentObject(appState)
         }
     }
-//        .environmentObject(appState) // chia sẻ cho toàn bộ app nếu cần
-}
-
-#Preview {
-    AppRouter()
 }

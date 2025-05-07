@@ -1,10 +1,3 @@
-//
-//  Onboarding.swift
-//  CoffeeBeen
-//
-//  Created by Trần Minh Quang on 23/4/25.
-//
-
 import SwiftUI
 
 struct BoardingData {
@@ -22,6 +15,7 @@ let onboardingData: [BoardingData] = [
 ]
 
 struct Onboarding: View {
+    let onFinishOnboarding: () -> Void
     @State private var currentIndex = 0
     let totalPages = 3
     var body: some View {
@@ -74,8 +68,7 @@ struct Onboarding: View {
                     if currentIndex < totalPages - 1 {
                         currentIndex += 1
                     } else {
-                        print("Get Started → Navigate to Home")
-                        // Navigate to home screen
+                        onFinishOnboarding()
                     }
                 }) {
                     Text(
@@ -90,8 +83,4 @@ struct Onboarding: View {
             }
         }
     }
-}
-
-#Preview {
-    Onboarding()
 }
